@@ -1,0 +1,9 @@
+## Privates
+.env
+
+## Vim
+*.swp
+*.swo
+~*
+*~
+

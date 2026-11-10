@@ -20,6 +20,11 @@ Open Source todo application for indywidual userser and companies. That focuses 
 - Task Operations
 - Task Graph
 
+### Security
+- Uses secure tunnel for connection
+- All data in database are encrypted
+- End user endcryption
+
 ### Technology Stack
 - nest.js
 - next,js

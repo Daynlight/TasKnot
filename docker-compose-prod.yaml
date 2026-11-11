@@ -13,6 +13,8 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - DB_PORT=5432
       - DB_HOST=db
+      - JWT_SECRET=${JWT_SECRET}
+      - DB_ENCRYPT=${DB_ENCRYPT}
     networks:
       - backend
       - backend_inner
@@ -47,6 +49,8 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+    environment:
+      - NEXT_PUBLIC_BACKEND_ADDRESS=${NEXT_PUBLIC_BACKEND_ADDRESS}
     networks:
       - frontend
     healthcheck:

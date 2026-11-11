@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { loginApi, registerApi } from './api';
 
 export default function Page() {
+  const router = useRouter();
   const [mode, setMode] = useState<'LOGIN' | 'REGISTER'>('LOGIN');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -11,7 +13,6 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +26,6 @@ export default function Page() {
       setLoading(false);
       setConfirmPassword('');
       setSuccessMessage(null);
-      setToken(null);
       return;
     }
     
@@ -37,7 +37,6 @@ export default function Page() {
           setError(result.error);
           setLoading(false);
           setSuccessMessage(null);
-          setToken(null);
         } else {
           setSuccessMessage(result.message || 'Account created successfully!');
           localStorage.removeItem('access_token');
@@ -46,7 +45,6 @@ export default function Page() {
           setConfirmPassword('');
           setPassword('');
           setLoading(false);
-          setToken(null);
         }
       } else {
         const result = await loginApi(email, password);
@@ -56,16 +54,16 @@ export default function Page() {
           setLoading(false);
           setConfirmPassword('');
           setSuccessMessage(null);
-          setToken(null);
         } else if (result.accessToken) {
           localStorage.setItem('access_token', result.accessToken);
-          setToken(result.accessToken);
           setLoading(false);
           setError(null);
           setEmail('');
           setPassword('');
           setConfirmPassword('');
           setSuccessMessage(null);
+          router.push('/dashboard');
+          router.refresh();
         }
       }
     } catch (err) {
@@ -150,15 +148,6 @@ export default function Page() {
           {error && <p className="text-red-400 text-m mt-1 text-center font-medium">{error}</p>}
           {successMessage && <p className="text-emerald-400 text-m mt-1 text-center font-medium">{successMessage}</p>}
         </form>
-
-        {/* Token JWT */}
-        {token && (
-          <div className="mt-6 p-4 bg-slate-950 border border-purple-800 rounded-sm break-all">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Access Token:</h3>
-            <p className="font-mono text-xs text-purple-400 leading-relaxed">{token}</p>
-          </div>
-        )}
-
       </div>
     </main>
   );

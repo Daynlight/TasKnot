@@ -1,5 +1,6 @@
 ## Privates
 .env
+scripts/
 
 ## Vim
 *.swp

@@ -7,6 +7,7 @@ export default function Page() {
   const [mode, setMode] = useState<'LOGIN' | 'REGISTER'>('LOGIN');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -17,25 +18,54 @@ export default function Page() {
     setLoading(true);
     setError(null);
     setSuccessMessage(null);
-
+    
+    if (mode === 'REGISTER' && password !== confirmPassword) {
+      setError('Passwords do not match.');
+      localStorage.removeItem('access_token');
+      setLoading(false);
+      setConfirmPassword('');
+      setSuccessMessage(null);
+      setToken(null);
+      return;
+    }
+    
     try {
       if (mode === 'REGISTER') {
         const result = await registerApi(email, password);
         if (!result.success) {
+          localStorage.removeItem('access_token');
           setError(result.error);
+          setLoading(false);
+          setSuccessMessage(null);
+          setToken(null);
         } else {
           setSuccessMessage(result.message || 'Account created successfully!');
+          localStorage.removeItem('access_token');
           setMode('LOGIN');
-          setEmail('');
+          setError(null);
+          setConfirmPassword('');
           setPassword('');
+          setLoading(false);
+          setToken(null);
         }
       } else {
         const result = await loginApi(email, password);
         if (!result.success) {
+          localStorage.removeItem('access_token');
           setError(result.error);
+          setLoading(false);
+          setConfirmPassword('');
+          setSuccessMessage(null);
+          setToken(null);
         } else if (result.accessToken) {
           localStorage.setItem('access_token', result.accessToken);
           setToken(result.accessToken);
+          setLoading(false);
+          setError(null);
+          setEmail('');
+          setPassword('');
+          setConfirmPassword('');
+          setSuccessMessage(null);
         }
       }
     } catch (err) {
@@ -76,7 +106,7 @@ export default function Page() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2.5 rounded-sm border border-purple-950 bg-slate-950 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm placeholder-slate-600"
+              className="w-full px-4 py-2.5 rounded-sm border border-purple-950 bg-slate-950 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm placeholder-slate-600"
               placeholder="name@example.com"
             />
           </div>
@@ -90,11 +120,27 @@ export default function Page() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2.5 rounded-sm border border-purple-950 bg-slate-950 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm placeholder-slate-600"
+              className="w-full px-4 py-2.5 rounded-sm border border-purple-950 bg-slate-950 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm placeholder-slate-600"
               placeholder="••••••••"
             />
           </div>
-
+          
+          {mode === 'REGISTER' && (
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required={mode === 'REGISTER'}
+                className="w-full px-4 py-2.5 rounded-sm border border-purple-950 bg-slate-950 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm placeholder-slate-600"
+                placeholder="••••••••"
+              />
+            </div>
+          )}
+          
           <button
             type="submit"
             disabled={loading}

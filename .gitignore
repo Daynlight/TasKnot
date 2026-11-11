@@ -5,6 +5,7 @@ scripts/
 ## Vim
 *.swp
 *.swo
+*.swn
 ~*
 *~
 
